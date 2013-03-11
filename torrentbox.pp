@@ -1,3 +1,4 @@
+# This receipe depends on the class "transmission_daemon" (http://github.com/olbat/puppet-transmission_daemon) and "lighttpd_secure_proxy" (http://github.com/olbat/puppet-lighttpd_secure_proxy).
 # Append this at the bottom of /etc/puppet/manifests/site.pp
 
 node 'tbox.lan' {
