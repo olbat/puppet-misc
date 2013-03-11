@@ -11,7 +11,7 @@ node 'tbox.lan' {
   $htpasswd_file = 'bt.passwd' # This file have to be present in the modules/lighttpd_secure_proxy/files directory
   $nas_address = '//nas.lan'
   $nas_kind = 'cifs'
-  $nas_mount_dir = "/media/nas"
+  $nas_mount_dir = '/media/nas'
   $nas_mount_options = '_netdev,...'
 
   ## NAS
