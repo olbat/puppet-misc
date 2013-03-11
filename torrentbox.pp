@@ -6,12 +6,19 @@ node 'tbox.lan' {
   $bt_address = '127.0.0.1'
   $bt_port = 9091
   $bt_url = '/bt'
+  $bt_blocklist = 'http://list.iblocklist.com/?list=bt_level1'
+  $ssl_cert = 'lighttpd.pem' # This file have to be present in the modules/lighttpd_secure_proxy/files directory
+  $htpasswd_file = 'bt.passwd' # This file have to be present in the modules/lighttpd_secure_proxy/files directory
+  $nas_address = '//nas.lan'
+  $nas_kind = 'cifs'
   $nas_mount_dir = "/media/nas"
+  $nas_mount_options = '_netdev,...'
 
   ## NAS
-  # Microsoft NAS export only
-  package { 'cifs-utils':
-    ensure => installed,
+  if nas_kind == 'cifs' {
+    package { 'cifs-utils':
+      ensure => installed,
+    }
   }
   
   # Create NAS mount directory
@@ -22,11 +29,11 @@ node 'tbox.lan' {
 
   # Mount the NAS
   mount { $nas_mount_dir:
-    device => '//nas.lan',
+    device => $nas_address,
     atboot => true,
     ensure => mounted,
-    fstype => 'cifs', # change it depending on the NAS export kind
-    options => '_netdev', # append the mount options
+    fstype => $nas_kind,
+    options => $nas_mount_options,
     require => File[$nas_mount_dir],
   }
 
@@ -37,23 +44,23 @@ node 'tbox.lan' {
     rpc_url => "${bt_url}/",
     rpc_port => $bt_port,
     rpc_whitelist => [$bt_address],
-    blocklist_url => "http://list.iblocklist.com/?list=bt_level1"
+    blocklist_url => $bt_blocklist,
   }
 
   ## Secure export on https
-  lighttpd_secure_proxy::htpasswd_file{'bt.passwd':
-    srcfile => 'puppet:///modules/lighttpd_secure_proxy/bt.passwd',
-    destfile => 'bt.passwd', # This file have to be present in the modules/lighttpd_secure_proxy/files directory
+  lighttpd_secure_proxy::htpasswd_file{$htpasswd_file:
+    srcfile => "puppet:///modules/lighttpd_secure_proxy/${htpasswd_file}",
+    destfile => $htpasswd_file,
   }
 
   class {'lighttpd_secure_proxy':
-    certificate => 'puppet:///modules/lighttpd_secure_proxy/lighttpd.pem', # This file have to be present in the modules/lighttpd_secure_proxy/files directory
+    certificate => "puppet:///modules/lighttpd_secure_proxy/${ssl_cert}",
     exports => [
       {
         'path_regexp' => "^${bt_url}",
         'address' => $bt_address,
         'port' => $bt_port,
-        'htpasswd_file' => 'bt.passwd',
+        'htpasswd_file' => $htpasswd_file,
       },
     ]
   }
