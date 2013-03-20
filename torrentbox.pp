@@ -41,7 +41,7 @@ node 'tbox.lan' {
   class {'transmission_daemon':
     download_dir => "${nas_mount_dir}/bittorrent",
     incomplete_dir => "/var/lib/transmission-daemon/downloads",
-    rpc_url => "${bt_url}/",
+    rpc_url => "${bt_url}",
     rpc_port => $bt_port,
     rpc_whitelist => [$bt_address],
     blocklist_url => $bt_blocklist,
