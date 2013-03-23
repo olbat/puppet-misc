@@ -7,6 +7,7 @@ node 'tbox.lan' {
   $bt_port = 9091
   $bt_url = '/bt'
   $bt_blocklist = 'http://list.iblocklist.com/?list=bt_level1'
+  $trusted_net = '192.168.0.0/24'
   $ssl_cert = 'lighttpd.pem' # This file have to be present in the modules/lighttpd_secure_proxy/files directory
   $htpasswd_file = 'bt.passwd' # This file have to be present in the modules/lighttpd_secure_proxy/files directory
   $nas_address = '//nas.lan'
@@ -61,6 +62,7 @@ node 'tbox.lan' {
         'address' => $bt_address,
         'port' => $bt_port,
         'htpasswd_file' => $htpasswd_file,
+        'trusted_net' => $trusted_net,
       },
     ]
   }
