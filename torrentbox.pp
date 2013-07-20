@@ -16,9 +16,34 @@ node 'tbox.lan' {
   $nas_mount_options = '_netdev,...'
 
   ## NAS
-  if nas_kind == 'cifs' {
-    package { 'cifs-utils':
-      ensure => installed,
+  case $nas_kind {
+    cifs: {
+      package { 'cifs-utils':
+        ensure => installed,
+        before => Mount[$nas_mount_dir],
+      }
+    }
+    nfs: {
+      package { 'nfs-common':
+        ensure => installed,
+        before => Mount[$nas_mount_dir],
+      }
+      package { 'rpcbind':
+        ensure => installed,
+        before => Mount[$nas_mount_dir],
+      }
+      service { 'nfs-common':
+        ensure => running,
+        enable => true,
+        hasstatus => true,
+        require => Package['nfs-common'],
+      }
+      service { 'rpcbind':
+        ensure => running,
+        enable => true,
+        hasstatus => false,
+        require => Package['rpcbind'],
+      }
     }
   }
   
